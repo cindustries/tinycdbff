@@ -19,7 +19,7 @@ cdb \- Constant DataBase library
  UINT len = 0;
  FIL file;
  char buf[100];
- f_open(&file, "TEST.CDB", FA_READ);
+ f_open(&file,"TEST.CDB",FA_READ);
  cdb_seek(&file,"ntpserver",9,&len);
  cdb_bread(&file,buf,len);
  buf[len] = '\0';
@@ -341,71 +341,9 @@ Note: in all examples below, error checking is not shown for brewity.
 .SS "Query Mode"
 
 .nf
- int fd;
- struct cdb cdb;
- char *key, *data;
- unsigned keylen, datalen;
-
- /* opening the database */
- fd = open(filename, O_RDONLY);
- cdb_init(&cdb, fd);
- /* initialize key and keylen here */
-
- /* single\-record search. */
- if (cdb_find(&cdb, key, keylen) > 0) {
-   datalen = cdb_datalen(&cdb);
-   data = malloc(datalen + 1);
-   cdb_read(&cdb, data, datalen, cdb_datapos(&cdb));
-   data[datalen] = '\\0';
-   printf("key=%s data=%s\\n", key, data);
-   free(data);
- }
- else
-   printf("key=%s not found\\n", key);
-
- /* multiple record search */
- struct cdb_find cdbf;
- int n;
- cdb_findinit(&cdbf, &cdb, key, keylen);
- n = 0;
- while(cdb_findnext(&cdbf) > 0) {
-   datalen = cdb_datalen(&cdb);
-   data = malloc(datalen + 1);
-   cdb_read(&cdb, data, datalen, cdb_datapos(&cdb));
-   data[datalen] = '\\0';
-   printf("key=%s data=%s\\n", key, data);
-   free(data);
-   ++n;
- }
- printf("key=%s %d records found\\n", n);
-
- /* sequential database access */
- unsigned pos;
- int n;
- cdb_seqinit(&pos, &cdb);
- n = 0;
- while(cdb_seqnext(&pos, &cdb) > 0) {
-   keylen = cdb_keylen(&cdb);
-   key = malloc(keylen + 1);
-   cdb_read(&cdb, key, keylen, cdb_keypos(&cdb));
-   key[keylen] = '\\0';
-   datalen = cdb_datalen(&cdb);
-   data = malloc(datalen + 1);
-   cdb_read(&cdb, data, datalen, cdb_datapos(&cdb));
-   data[datalen] = '\\0';
-   ++n;
-   printf("record %n: key=%s data=%s\\n", n, key, data);
-   free(data); free(key);
- }
- printf("total records found: %d\\n", n);
-
- /* close the database */
- cdb_free(&cdb);
- close(fd);
-
- /* simplistic query mode */
- fd = open(filename, O_RDONLY);
- if (cdb_seek(fd, key, keylen, &datalen) > 0) {
+ FIL file;
+ f_open(&file, filename, FA_READ);
+ if (cdb_seek(&file, key, keylen, &datalen) > 0) {
    data = malloc(datalen + 1);
    cdb_bread(fd, data, datalen);
    data[datalen] = '\\0';
@@ -419,13 +357,15 @@ Note: in all examples below, error checking is not shown for brewity.
 .SS "Create Mode"
 
 .nf
- int fd;
+ FIL *fd;
+ FRESULT fr;
  struct cdb_make cdbm;
  char *key, *data;
  unsigned keylen, datalen;
 
  /* initialize the database */
- fd = open(filename, O_RDWR|O_CREAT|O_TRUNC, 0644);
+ fr = f_open(fd, "NEW.CDB", FA_READ|FA_WRITE|FA_CREATE_ALWAYS);
+ if (fr) return -1; // error on opening
  cdb_make_start(&cdbm, fd);
 
  while(have_more_data()) {
@@ -437,7 +377,7 @@ Note: in all examples below, error checking is not shown for brewity.
 
  /* finalize and close the database */
  cdb_make_finish(&cdbm);
- close(fd);
+ f_close(fd);
 .fi
 
 .SH "SEE ALSO"

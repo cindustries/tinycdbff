@@ -36,7 +36,7 @@ int internal_function
 _cdb_make_fullwrite(FIL *fd, const unsigned char *buf, unsigned len)
 {
   FRESULT fr;
-  UINT bw;
+  UINT bw = 0;
   while(len) {
     fr = f_write(fd, buf, len, &bw);
     if (fr || bw == 0) return -1;
