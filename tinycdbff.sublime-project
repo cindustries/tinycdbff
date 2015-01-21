@@ -1,0 +1,20 @@
+{
+  "folders":
+  [
+    {
+      "path": ".",
+      "file_exclude_patterns":
+      [
+        "*.bin",
+        "*.elf",
+        "*.hex",
+        "*.o",
+        "*.a",
+        "*.d",
+        "*.sublime-project",
+        "*.sublime-workspace",
+        "*.swp"
+      ],
+    }
+  ]
+}
