@@ -12,3 +12,4 @@
 *.map
 *.a
 *.sublime-workspace
+*.gimple

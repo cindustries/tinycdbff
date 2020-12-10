@@ -77,6 +77,6 @@ f_close(fd);
 Support
 -------
 
-[Freenode: #vonBienenstock](http://webchat.freenode.net/?channels=#vonBienenstock)
+Support at **#hardware** on **irc.perl.org**
 
-[Report issues here at GitHub](https://github.com/vonBienenstock/tinycdbff/issues)
+[Report issues here at GitHub](https://github.com/cindustries/tinycdbff/issues)
