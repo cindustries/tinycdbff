@@ -25,7 +25,7 @@ CFLAGS              += -I$(TINYCDBFF_INCLUDE)
 EXTRA_SOURCE        += $(addprefix $(TINYCDBFF_SOURCE_DIR), $(TINYCDBFF_SOURCE))
 ```
 
-Sample query usages:
+Sample query usage:
 
 ```c
 #include "ff.h"
@@ -35,13 +35,13 @@ FIL file;
 f_open(&file, filename, FA_READ);
 if (cdb_seek(&file, key, keylen, &datalen) > 0) {
   data = malloc(datalen + 1);
-  cdb_bread(fd, data, datalen);
-  data[datalen] = '\\0';
-  printf("key=%s data=%s\\n", key, data);
+  cdb_bread(&file, data, datalen);
+  data[datalen] = '\0';
+  printf("key=%s data=%s\n", key, data);
 } else {
-  printf("key=%s not found\\n", key); 
+  printf("key=%s not found\n", key);
 }
-f_close(fd);
+f_close(&file);
 ```
 
 Sample create usage:
@@ -50,16 +50,16 @@ Sample create usage:
 #include "ff.h"
 #include "cdb.h"
 
-FIL *fd;
+FIL file;
 FRESULT fr;
 struct cdb_make cdbm;
 char *key, *data;
 unsigned keylen, datalen;
 
 /* initialize the database */
-fr = f_open(fd, "NEW.CDB", FA_READ|FA_WRITE|FA_CREATE_ALWAYS);
+fr = f_open(&file, "NEW.CDB", FA_READ|FA_WRITE|FA_CREATE_ALWAYS);
 if (fr) return -1; // error on opening
-cdb_make_start(&cdbm, fd);
+cdb_make_start(&cdbm, &file);
 
 while(have_more_data()) {
   /* initialize key and data */
@@ -71,8 +71,30 @@ while(have_more_data()) {
 
 /* finalize and close the database */
 cdb_make_finish(&cdbm);
-f_close(fd);
+f_close(&file);
 ```
+
+Compile-checking
+----------------
+
+The sources are a drop-in module; a real build links them against Chan FatFs.
+To catch breakage without vendoring all of FatFs, `t/compile-check.sh`
+syntax-checks every source against a minimal FatFs stub (`t/ff.h`):
+
+```sh
+sh t/compile-check.sh
+```
+
+This also runs on every push and pull request via GitHub Actions. It proves the
+sources compile; it does not exercise cdb behaviour (that needs real FatFs and
+storage).
+
+License
+-------
+
+Public domain — see [LICENSE](LICENSE) (The Unlicense). Based on tinycdb by
+Michael Tokarev (public domain); Chan FatFs port by Torsten Raudssus. Each
+source file carries the same public-domain dedication in its header.
 
 Support
 -------

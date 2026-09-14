@@ -1,0 +1,13 @@
+name: compile-check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  compile-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax-check sources against the FatFs stub
+        run: sh t/compile-check.sh
