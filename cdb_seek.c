@@ -7,13 +7,8 @@
  *
  */
 
-#include <unistd.h>
 #include "cdb_int.h"
 #include "ff.h" // ChanFs must be in include directory
-
-#ifndef SEEK_SET
-# define SEEK_SET 0
-#endif
 
 /* read a chunk from file, ignoring interrupts (EINTR) */
 

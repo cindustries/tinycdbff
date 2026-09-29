@@ -8,7 +8,6 @@
  */
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <assert.h>
 #include "cdb_int.h"
 
