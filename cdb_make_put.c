@@ -41,9 +41,9 @@ remove_record(struct cdb_make *cdbmp, unsigned rpos, unsigned rlen) {
   fd = cdbmp->cdb_fd;
   do {
     r = len > sizeof(cdbmp->cdb_buf) ? sizeof(cdbmp->cdb_buf) : len;
-    if (f_lseek(fd, pos + rlen) < 0 || f_read(fd, cdbmp->cdb_buf, r, &br) || br == 0)
+    if (f_lseek(fd, pos + rlen) != FR_OK || f_read(fd, cdbmp->cdb_buf, r, &br) || br == 0)
       return -1;
-    if (f_lseek(fd, pos) < 0 ||
+    if (f_lseek(fd, pos) != FR_OK ||
         _cdb_make_fullwrite(fd, cdbmp->cdb_buf, r) < 0)
       return -1;
     pos += br;
@@ -83,7 +83,7 @@ match(struct cdb_make *cdbmp, unsigned pos, const char *key, unsigned klen)
   UINT br;
   FRESULT fr;
 
-  if (f_lseek(cdbmp->cdb_fd, pos) < 0)
+  if (f_lseek(cdbmp->cdb_fd, pos) != FR_OK)
     return 1;
   if (f_read(cdbmp->cdb_fd, cdbmp->cdb_buf, 8, &br) || br != 8)
     return 1;
@@ -152,7 +152,7 @@ findrec(struct cdb_make *cdbmp,
       --cdbmp->cdb_rcnt;
   }
 finish:
-  if (seeked && f_lseek(cdbmp->cdb_fd, cdbmp->cdb_dpos) < 0)
+  if (seeked && f_lseek(cdbmp->cdb_fd, cdbmp->cdb_dpos) != FR_OK)
     return -1;
   return ret;
 }

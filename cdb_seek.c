@@ -49,7 +49,7 @@ cdb_seek(FIL *fd, const void *key, unsigned klen, unsigned *dlenp)
   hval = cdb_hash(key, klen);
   pos = (hval & 0xff) << 3; /* position in TOC */
   /* read the hash table parameters */
-  if (f_lseek(fd, pos) < 0 || cdb_bread(fd, rbuf, 8) < 0)
+  if (f_lseek(fd, pos) != FR_OK || cdb_bread(fd, rbuf, 8) < 0)
     return -1;
   if ((htsize = cdb_unpack(rbuf + 4)) == 0)
     return 0;
@@ -58,7 +58,7 @@ cdb_seek(FIL *fd, const void *key, unsigned klen, unsigned *dlenp)
   htstart = cdb_unpack(rbuf);
 
   for(;;) {
-    if (needseek && f_lseek(fd, htstart + (hti << 3)) < 0)
+    if (needseek && f_lseek(fd, htstart + (hti << 3)) != FR_OK)
       return -1;
     if (cdb_bread(fd, rbuf, 8) < 0)
       return -1;
@@ -68,7 +68,7 @@ cdb_seek(FIL *fd, const void *key, unsigned klen, unsigned *dlenp)
     if (cdb_unpack(rbuf) != hval) /* hash value not matched */
       needseek = 0;
     else { /* hash value matched */
-      if (f_lseek(fd, pos) < 0 || cdb_bread(fd, rbuf, 8) < 0)
+      if (f_lseek(fd, pos) != FR_OK || cdb_bread(fd, rbuf, 8) < 0)
 	return -1;
       if (cdb_unpack(rbuf) == klen) { /* key length matches */
 	/* read the key from file and compare with wanted */
