@@ -1,0 +1,32 @@
+---
+claimed_at: 2026-09-29T03:45:22Z
+claimed_by: review
+class: standard
+completed: 2026-09-29T02:29:15Z
+created: 2026-09-29T00:18:40Z
+id: 2
+priority: low
+started: 2026-09-29T00:57:29Z
+status: done
+tags:
+- port
+- portability
+title: Drop unused POSIX <unistd.h> for embedded portability
+updated: 2026-09-29T03:45:22Z
+---
+
+The real consumer is bare-metal/RTOS Chan FatFs where <unistd.h> (POSIX) may not
+exist. It is included but unused (leftover from the POSIX original, which used lseek/SEEK_SET):
+  cdb_seek.c:10, cdb_make.c:10, cdb_make_put.c:11
+The SEEK_SET fallback in cdb_seek.c:14-16 is also dead (f_lseek takes an absolute offset).
+
+Confirm nothing in each file references unistd.h/SEEK_SET symbols before removing, then
+sh t/compile-check.sh must stay clean. Small, surgical. Lane: tinycdbff-worker.
+
+2026-09-29 01:00 Removed unused POSIX '#include <unistd.h>' from cdb_seek.c, cdb_make.c, cdb_make_put.c, and the dead SEEK_SET fallback block from cdb_seek.c (f_lseek takes an absolute offset, no SEEK_SET arg). Confirmed by grep: no unistd.h symbol or SEEK_SET is referenced anywhere else; SEEK_SET appeared only in its own dead #ifndef block. errno/string/ff/cdb come via cdb_int.h, so no header dropped. compile-check clean. NOT committed.
+
+2026-09-29 02:29 Committed c1bdf5f
+
+2026-09-29 02:29 Committed c1bdf5f
+
+2026-09-29 03:45 Commit hash updated after trailer rewrite: 0e4fb3e (was c1bdf5f)
