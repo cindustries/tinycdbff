@@ -13,3 +13,7 @@
 *.a
 *.sublime-workspace
 *.gimple
+
+# karr materialized task view -- never commit
+tasks/
+config.yml
