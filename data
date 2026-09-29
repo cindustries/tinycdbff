@@ -1,0 +1,40 @@
+---
+claimed_at: 2026-09-29T03:45:26Z
+claimed_by: review
+class: standard
+completed: 2026-09-29T02:29:42Z
+created: 2026-09-29T00:18:44Z
+id: 3
+priority: high
+started: 2026-09-29T02:20:08Z
+status: done
+tags:
+- tests
+- coverage
+title: Add in-memory FatFs behavioural test harness + round-trip coverage
+updated: 2026-09-29T03:45:26Z
+---
+
+Current tests are syntax-only (t/compile-check.sh against the opaque t/ff.h stub) —
+they prove the sources compile, not that cdb works. Raise real coverage:
+
+Build an in-memory FatFs shim (concrete FIL over a RAM buffer with real f_read/f_write/
+f_lseek), separate from the opaque stub (e.g. under t/mem/, its own ff.h + ff.c, compiled
+with -I t/mem). FIL is pointer-only in cdb code, so the shim is clean.
+
+Cover, host-side, without hardware:
+  - cdb_make_start/add/finish -> cdb_seek/cdb_bread round-trip, values recovered byte-exact
+  - not-found returns 0
+  - put modes: ADD, INSERT (dup rejected), REPLACE, WARN, REPLACE0
+  - cdb_hash / cdb_pack / cdb_unpack round-trip
+  - an error path: force a failing f_lseek and assert it propagates (ties to task k1)
+
+Add a runner (t/run-tests.sh) and wire it into .github/workflows alongside compile-check.
+Optionally a gcov target to report line coverage. Never vendor real Chan FatFs into t/.
+Lane: tinycdbff-test-writer (intent owned by the dispatcher).
+
+2026-09-29 02:20 Added t/mem/{ff.h,ff.c} RAM FatFs shim w/ lseek fault injection, t/test_cdb.c (14 groups, 2102 checks), t/run-tests.sh, .github/workflows/behavioural-tests.yml. All green; compile-check green; no cdb source touched.
+
+2026-09-29 02:29 Committed 3574f9d
+
+2026-09-29 03:45 Commit hash updated after trailer rewrite: 190427c (was 3574f9d)
