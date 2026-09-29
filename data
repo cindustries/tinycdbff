@@ -1,0 +1,42 @@
+---
+claimed_at: 2026-09-29T03:45:18Z
+claimed_by: review
+class: standard
+completed: 2026-09-29T02:29:34Z
+created: 2026-09-29T00:18:20Z
+id: 1
+priority: high
+started: 2026-09-29T00:57:25Z
+status: done
+tags:
+- bug
+- port
+- error-handling
+title: Fix dead f_lseek error checks (FRESULT is never < 0)
+updated: 2026-09-29T03:45:18Z
+---
+
+f_lseek/f_read/f_write return FRESULT, a non-negative enum (FR_OK==0), so
+"if (f_lseek(...) < 0)" is dead: a real seek error slips through. Introduced by the
+POSIX->FatFs port (upstream lseek() returned -1).
+
+Sites to change from "< 0" to "!= FR_OK" (keep cdb_bread(...) < 0, that returns C-style -1):
+  cdb_seek.c:52, 61, 71
+  cdb_make_put.c:44 (part of the f_read compound), 46, 86
+
+Already correct, leave as reference for the right style: cdb_make.c:160 (!= 0),
+cdb_make_put.c:63 zerofill (truthy).
+
+Verify: sh t/compile-check.sh stays clean; add/adjust a behavioural error-path test
+(see the harness ticket) that forces a failing f_lseek and asserts the error propagates.
+Lane: tinycdbff-worker.
+
+2026-09-29 01:00 Also found (OUT OF SCOPE, left untouched): cdb_make_put.c findrec() 'finish:' block has a FOURTH dead check of the same class -- 'if (seeked && f_lseek(cdbmp->cdb_fd, cdbmp->cdb_dpos) < 0)' (was line 155). Same FRESULT-never-negative bug as the six sites in this card, but NOT in the card's site list, so I did not change it. Needs a scope decision.
+
+2026-09-29 01:00 Fixed 6 dead f_*<0 checks -> !=FR_OK: cdb_seek.c (f_lseek at pre-edit L52/61/71, cdb_bread<0 left as-is), cdb_make_put.c (f_lseek at pre-edit L44 compound/L46/L86; f_read truthy check and _cdb_make_fullwrite<0 left as-is). Success path unchanged (FR_OK==0, both forms false); error path now actually fires. compile-check clean. Behavioural error-path test deferred to k3 per brief. NOT committed. NOTE: 4th same-class dead check (finish: block f_lseek<0) found & left untouched -- see timestamped note, needs scope decision.
+
+2026-09-29 02:19 SCOPE EXPANDED per coordinator: the 7th site I flagged is now folded into this card. Fixed cdb_make_put.c findrec() 'finish:' block: 'if (seeked && f_lseek(cdbmp->cdb_fd, cdbmp->cdb_dpos) < 0)' -> '!= FR_OK'. Confirmed same FRESULT-never-negative bug (tests an f_lseek return, guarded by 'seeked'; success path FR_OK==0 unchanged, error path now fires). ALL 7 f_lseek sites across cdb_seek.c + cdb_make_put.c now covered -- grep confirms no f_* '< 0' check remains (the two remaining '< 0' hits are cdb_bread companions, correct C-style). compile-check clean. Still NOT committed -- card stays one commit covering the complete bug class.
+
+2026-09-29 02:29 Committed bff98c9
+
+2026-09-29 03:45 Commit hash updated after trailer rewrite: 30aa708 (was bff98c9)
