@@ -3,5 +3,13 @@
     "briefing@getty": true,
     "skilletor@getty": true,
     "ruler@getty": true
+  },
+  "extraKnownMarketplaces": {
+    "getty": {
+      "source": {
+        "source": "github",
+        "repo": "Getty/marketplace"
+      }
+    }
   }
 }
