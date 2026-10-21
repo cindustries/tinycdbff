@@ -1,9 +1,9 @@
 # tinycdbff House Rules
 
 Apply to every task in this repository unless explicitly overridden. Bias: caution over speed
-on non-trivial work. Loaded automatically at launch (same priority as `CLAUDE.md`); subagents get
-their discipline from the skills force-loaded via `briefing.skills` — this file is for the
-orchestrating agent.
+on non-trivial work; use judgment on trivial tasks. Loaded automatically at launch (same
+priority as `CLAUDE.md`); subagents get their discipline from the skills force-loaded via
+`briefing.skills` — this file is for the orchestrating agent.
 
 ## Engineering discipline
 
