@@ -1,73 +1,39 @@
 # tinycdbff House Rules
 
-Apply to every task in this repository unless explicitly overridden. Bias: caution over speed
-on non-trivial work; use judgment on trivial tasks. Loaded automatically at launch (same
-priority as `CLAUDE.md`); subagents get their discipline from the skills force-loaded via
-`briefing.skills` — this file is for the orchestrating agent.
+The shared house rules come from skilletor — bundle `getty-house@getty`: engineering
+discipline, the delegation lock, the publish gate, karr coordination. They load as
+`.claude/rules/.local.*.md`; if they are missing, run `skilletor sync` and publish nothing
+until they load. This file adds what is true only here, and wins where it differs.
 
-## Engineering discipline
+## What this repo is
 
-1. **Think before coding** — State assumptions; when uncertain, ask rather than guess. Push back
-   when a simpler approach exists. Stop when confused; name what's unclear.
-2. **Surgical changes** — This is a faithful port of upstream tinycdb. Touch only what the task
-   needs; don't "improve" adjacent code, style or comments. A deviation from upstream must be
-   deliberate and explained.
-3. **Match the codebase** — Conformance over taste. The C style, the deliberate `cdb_pack` shift
-   form, the terse variable names — keep them.
-4. **A red result is a claim before it is a failure** — Before changing code to make a check pass,
-   say what the check asserts and whether your fix keeps that claim. Reproduce a bug before fixing
-   it; leave a regression test behind.
-5. **Fail loud** — "Done" is wrong if anything was skipped. "Tests pass" is wrong if only the
-   compile-check ran (see hazards).
+A public-domain port of Michael Tokarev's TinyCDB (a constant database, based on djb's cdb)
+to Chan FatFs — a source-drop module that consumers vendor and link against their own FatFs.
+Read first: `cdb.h`, `cdb_int.h` and the caller of the function you touch.
 
-## Delegation
+## Agent team
 
-- **You can spawn subagents** (orchestrating main agent): Do NOT touch behaviour-relevant code
-  yourself — delegate. Your lane: coordinate, inspect, plan, review diffs, run tests, edit prose
-  docs. Only the `tinycdbff-*` agents get their skills force-loaded via `briefing.skills` — you get
-  no briefing. When in doubt, delegate.
-
-  | Task | Agent |
-  |---|---|
-  | Implement / refactor / debug behaviour-relevant code | `tinycdbff-worker` (default) |
-  | Write / extend tests | `tinycdbff-test-writer` |
-  | Commits, card → done | `tinycdbff-release-manager` |
-
-  **Only `tinycdbff-release-manager` commits.** A worker hands its card to `review`
-  and reports; you then dispatch the release-manager to cut the commit.
-
-- **You cannot spawn subagents** (you ARE a `tinycdbff-*` agent): the delegation
-  lock does not apply — implement, refactor, debug and test per these rules.
+| Task | Agent |
+|---|---|
+| Implement / refactor / debug behaviour-relevant code | `tinycdbff-worker` (default) |
+| Write / extend tests | `tinycdbff-test-writer` |
+| Commits, card → done | `tinycdbff-release-manager` |
+| Read-only research, audit, gap analysis | `tinycdbff-worker` ("read-only, change nothing") |
 
 Behaviour-relevant = the C sources: runtime behaviour, the public API in `cdb.h`, the on-disk
 format, error handling and the test harness. Pure prose (README, CLAUDE.md, this file) is not.
 
-## Coordination — karr board
+## Release
 
-Ticket coordination is the orchestrating agent's job, so `karr` is always in scope — just use the
-CLI, don't invoke the coordination skill first. State lives in `refs/karr/*`; this repo has its own
-board.
+There is **no package release** — tinycdbff is vendored source, nothing is built or published.
+`sh t/compile-check.sh` and the behavioural tests are fine anytime; `git push`, tags and the
+GitHub tracker (`cindustries/tinycdbff`) sit under the publish gate.
 
-- `karr list --compact` / `karr board` — open work · `karr show ID` — detail
-- `karr create "Title" --priority high --tags a,b --body '…'` — new ticket
-- `karr move ID in-progress --claim NAME` — start · `karr handoff ID --claim NAME --note "…"` — to review
-- mutating commands auto-sync; `karr sync --pull|--push` for explicit exchange
+## Hazards
 
-Card life cycle: you claim and hand out → the worker notes and ends at `review` →
-the release-manager commits and moves it to `done`. Full command surface: skill
-`kanban-issues-karr-coordination`.
-
-## Release & the public tracker — never without instruction
-
-`sh t/compile-check.sh` and the behavioural tests are fine anytime. There is **no package
-release** — tinycdbff is vendored source, nothing is built or published. `git push` and tags are
-STRICTLY forbidden without the maintainer's explicit go-ahead. The GitHub issue tracker
-(`cindustries/tinycdbff`) carries real users' reports under the maintainer's name — **never read,
-comment on, close or create an issue there on your own initiative**, only on explicit instruction
-about a specific issue.
-
-## Project hazards — the traps that make the wrong thing look right
-
+- **A faithful port of upstream tinycdb.** A deviation from upstream must be deliberate and
+  explained. Keep the C style, the deliberate `cdb_pack` shift form and the terse variable
+  names.
 - **compile-check is syntax-only.** `t/compile-check.sh` passing means the sources *compile*
   against an opaque stub, not that the index works. Never claim behaviour is verified on the
   compile-check alone — behaviour needs the in-memory FatFs shim.
@@ -82,5 +48,4 @@ about a specific issue.
 ## C specifics — reference, don't restate
 
 The format contract, the FatFs seam, the API conventions, the portability rule and the test model
-live in skill `tinycdbff-core` (force-loaded per lane via `briefing.skills`) — do not duplicate it
-here.
+live in skill `tinycdbff-core` (force-loaded per lane via `briefing.skills`).

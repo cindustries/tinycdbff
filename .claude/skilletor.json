@@ -1,8 +1,16 @@
 {
-  "targets": ["claude"],
+  "targets": [
+    "claude"
+  ],
   "sources": {
-    "getty": { "git": "https://github.com/Getty/skills", "ref": "main" },
-    "karr": { "git": "https://github.com/Getty/karr", "ref": "main" }
+    "getty": {
+      "git": "https://github.com/Getty/skills",
+      "ref": "main"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr",
+      "ref": "main"
+    }
   },
   "install": {
     "skills": [
@@ -10,6 +18,9 @@
       "getty-git-usage@getty",
       "kanban-issues-karr-ticket@karr",
       "kanban-issues-karr-coordination@karr"
+    ],
+    "bundles": [
+      "getty-house@getty"
     ]
   }
 }

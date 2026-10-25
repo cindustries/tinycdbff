@@ -17,8 +17,8 @@ live in skill `tinycdbff-core`, not here.
 ## Delegation
 
 Delegate behaviour-relevant code to the right agent instead of touching it yourself
-— the principle and the lane definitions are in `.claude/rules/tinycdbff-rules.md`
-(auto-loaded every turn).
+— the principle is a shared house rule (skilletor bundle `getty-house@getty`); lanes and
+hazards are in `.claude/rules/tinycdbff-rules.md` (auto-loaded every turn).
 
 | Task | Agent |
 |---|---|
