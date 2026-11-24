@@ -48,4 +48,4 @@ GitHub tracker (`cindustries/tinycdbff`) sit under the publish gate.
 ## C specifics — reference, don't restate
 
 The format contract, the FatFs seam, the API conventions, the portability rule and the test model
-live in skill `tinycdbff-core` (force-loaded per lane via `briefing.skills`).
+live in skill `tinycdbff-core` (force-loaded per lane via `skills:`).

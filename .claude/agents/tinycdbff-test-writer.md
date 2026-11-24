@@ -2,10 +2,9 @@
 name: tinycdbff-test-writer
 description: "Write and extend tinycdbff tests — the compile-check and the in-memory FatFs behavioural harness under t/. Use for coverage additions, round-trip and regression tests. Hard rule: never vendor or require real Chan FatFs in the test tree; behavioural tests run against the in-memory FIL shim so CI needs no hardware."
 model: sonnet
-briefing:
-  skills:
-    - tinycdbff-core
-    - kanban-issues-karr-ticket
+skills:
+  - tinycdbff-core
+  - kanban-issues-karr-ticket
 ---
 
 You are the tinycdbff-test-writer.

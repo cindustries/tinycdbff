@@ -26,7 +26,7 @@ hazards are in `.claude/rules/tinycdbff-rules.md` (auto-loaded every turn).
 | Write / extend tests | `tinycdbff-test-writer` |
 | Commits, card → done | `tinycdbff-release-manager` |
 
-The agents carry their knowledge via `briefing.skills` (see `.claude/agents/`); the
+The agents carry their knowledge via `skills:` (see `.claude/agents/`); the
 main agent delegates rather than loading those skills itself. **Only the
 release-manager commits** — workers and the test-writer leave a commit-ready tree
 and a report.
