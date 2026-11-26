@@ -4,7 +4,6 @@ description: "Owns tinycdbff's git history — cuts commits from the worker's co
 model: sonnet
 skills:
   - getty-git-commit-style
-  - getty-git-usage
   - kanban-issues-karr-ticket
 ---
 
